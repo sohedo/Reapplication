@@ -1,40 +1,72 @@
+# Data description and coding
+
 ## Data sources and study population
 
 The study combines pseudonymously linked Finnish administrative registers and genetic data. Statistics Finland provides annual information on university applications and admission, family linkages, and socioeconomic status. The Finnish Institute for Health and Welfare (THL) provided psychiatric diagnoses and genetic data collected in population health surveys. Reimbursed medication records from the Social Insurance Institution of Finland (Kela) are used to identify psychotropic medication use.
 
 The analytic sample consists of individuals born in 1987-1996 with the required linked register information and a polygenic score for educational attainment (EA-PGS) available from one parent. Only the firstborn sibling from each family is retained. The manuscript reports 8,872 individuals in the analytic sample.
 
-## Separate analyses
 
-The paper first examines **application outcomes** at the person level in the full analytic sample. Individuals are classified as:
+## Cross-sectional analysis of application outcomes
+
+The paper first examines **application outcomes** at the person level in the full analytic sample. One observation per individual is used. Individuals are classified as:
 
 1. never applied to university;
 2. applied but were rejected; or
 3. received direct admission.
 
-The manuscript reports 5,122 individuals who never applied, 2,797 who were rejected, and 953 who received direct admission. These are cross-sectional analyses and are separate from the discrete-time analysis.
+The manuscript reports 5,122 individuals who never applied, 2,797 who were rejected, and 953 who received direct admission.
 
-The analysis of **stop applying after rejection** is longitudinal and is restricted to the 2,797 initially rejected applicants. Annual records are organized as person-years. The manuscript reports 4,987 person-years in these models.
+In the Stata code, `applicationoutcomes` identifies these three groups:
+
+- `applicationoutcomes = 1`: never applied;
+- `applicationoutcomes = 2`: rejected;
+- `applicationoutcomes = 3`: direct admission.
+
+The rejected category combines individuals who applied without success and individuals who were rejected and later successfully reapplied. The cross-sectional application outcome is therefore distinct from the later longitudinal outcome of whether a rejected applicant stops applying.
+
+`01_cross_sectional_application_outcomes.do` reproduces the descriptive comparisons reported in Table 1 and a multinomial logistic regression of the three application outcomes. Rejected applicants are the reference category in the multinomial model. Robust standard errors are used.
+
+### Variables used in the cross-sectional analysis
+
+| Stata variable | Description |
+|---|---|
+| `applicationoutcomes` | Application outcome: never applied, rejected, or direct admission |
+| `use_uni_parents` | University/polytechnic degree of the non-genotyped parent vs. less educated |
+| `use_earnings_3` | Income of the non-genotyped parent: low (lowest 20%), medium (middle 60%), high (highest 20%) |
+| `use_Educational_attainment_PRS` | EA-PGS of the genotyped parent |
+| `mental17until` | Psychiatric diagnosis before age 18 |
+| `ever_psychotropic_a` | Any psychotropic medication use during the observation period; used in the descriptive comparisons |
+| `female` | Female |
+| `yearofbirth` | Birth cohort |
+| `nuts2` | Region of birth at NUTS2 level |
+| `use_PC1`-`use_PC10` | Genetic principal components |
+| `use_sample` | Source health survey |
+| `sfm_PRS` | Indicates whether the parental EA-PGS comes from the mother or father |
+
 
 ## University application coding
 
 University application records are collapsed to one record per individual and calendar year. If an individual applied to several university study places in the same year, the annual outcome is coded as admission if the individual was admitted to at least one of them; otherwise the annual outcome is rejection.
 
-In the preparation code:
+In the preparation code, `child_shnro` identifies the individual and `vuosi` identifies the calendar year.
 
 - `access = .` indicates no university application in that year;
 - `access = 0` indicates that the individual applied but was not admitted;
 - `access = 1` indicates that the individual was admitted to at least one university study place.
 
-From this, `hakee` identifies whether the individual applied and `paasee` identifies university admission.
+From this, `hakee` identifies whether the individual applied and `paasee` identifies university admission. Years with no application are retained because they are needed to identify stop applying during longitudinal follow-up.
 
-## Coding of the discrete-time analysis
+
+## Construction of the longitudinal person-year sample
+
+The analysis of **stop applying after rejection** is longitudinal and restricted to the 2,797 initially rejected applicants. Annual records are organized as person-years. The manuscript reports 4,987 person-years in these models.
 
 The first university application defines the beginning of the application history. The re-application analysis includes individuals whose first application ended in rejection. Follow-up begins in the next calendar year.
 
-`hakukerta` is the annual clock from the first application. The first application year is `hakukerta = 1`, so `hakukerta = 2` is the first post-rejection risk interval. The models include `hakukerta` as a categorical time variable to allow the baseline hazard to vary across annual intervals. Max 4-year follow up.
+`hakukerta` is the annual clock from the first application. The first application year is `hakukerta = 1`, so `hakukerta = 2` is the first post-rejection risk interval. The models include `hakukerta` as a categorical time variable to allow the baseline hazard to vary across annual intervals. Follow-up is limited to a maximum of four post-rejection years.
 
-The outcome `stop_apply` is coded 1 in the first follow-up year in which the individual does not apply to university and 0 otherwise while the individual remains at risk. 
+The outcome `event` is coded 1 in the first follow-up year in which the individual does not apply to university and 0 otherwise while the individual remains at risk. A gap year therefore counts as stop applying.
 
 Follow-up ends at the earliest of:
 
@@ -43,32 +75,40 @@ Follow-up ends at the earliest of:
 - four post-rejection follow-up years; or
 - the last observable year.
 
-Years in which individuals are older than 24 are excluded before the risk set is constructed. Admission after rejection ends follow-up with `stop_apply = 0` in the admission year.
-
-## Variables used in the discrete-time models
+Years in which individuals are older than 24 are excluded before the risk set is constructed. Admission after rejection ends follow-up with `event = 0` in the admission year.
 
 
-| Public code name | Description in the manuscript |
- 
-| `stop_apply` | Stop applying to university after rejection |
-| `parental_education` | Parents have university/polytechnic degree vs. less educated |
-| `parental_income` | Parental income: low (lowest 20%), medium (middle 60%), high (highest 20%) |
-| `parental_EA_PGS` | Parental polygenic score for educational attainment |
-| `psychiatric_diagnosis` | Psychiatric diagnosis before age 18 |
-| `psychotropic_medication` | Psychotropic medication use in the given year |
-| `child_born` | Child born |
-| `employment_months` | Employment, measured in months |
-| `started_polytechnic` | Started studies in polytechnics |
-| `unemployment_3m` | Unemployment period of more than three months |
+## Variables used in the discrete-time hazard models
+
+| Stata variable | Description |
+|---|---|
+| `event` | Stop applying to university after rejection |
+| `hakukerta` | Annual time from the first university application; entered categorically as the baseline hazard |
+| `use_uni_parents` | University/polytechnic degree of the non-genotyped parent vs. less educated |
+| `use_earnings_3` | Income of the non-genotyped parent: low, medium, or high |
+| `use_Educational_attainment_PRS` | EA-PGS of the genotyped parent |
+| `mental17until` | Psychiatric diagnosis before age 18 |
+| `psychotropic_a` | Psychotropic medication use in the given year |
+| `lapsi` | Child born |
+| `tulo_p` | Employment, measured in months |
+| `poly` | Started studies in polytechnics |
+| `tyke_3kk` | Unemployment period of more than three months |
+| `syntyv` | Birth cohort |
 | `female` | Female |
-| `matriculation_year` | Year of upper-secondary/matriculation qualification |
-| `region_birth` | Region of birth at NUTS2 level |
-| `parental_EA_PGS_quintile` | EA-PGS quintile used in interaction figures |
+| `vuosi_yoL` | Year of upper-secondary/matriculation qualification |
+| `nuts2` | Region of birth at NUTS2 level |
+| `use_EducationPGS_5` | EA-PGS quintile used in interaction figures |
 | `use_PC1`-`use_PC10` | Genetic principal components |
-| `health_survey` | Source health survey |
+| `use_sample` | Source health survey |
+| `sfm_PRS` | Indicates whether the parental EA-PGS comes from the mother or father |
 
-Parental education and income are taken from the non-genotyped parent where possible, while the EA-PGS is taken from the genotyped parent. Parental income is based on average taxable income in 2001-2009.
+Parental education and income are taken from the non-genotyped parent, while the EA-PGS is taken from the genotyped parent. `sfm_PRS` is included as a control for whether the EA-PGS comes from the mother or father. Parental income is based on average taxable income in 2001-2009.
+
+The GxE model uses manually created product terms. `pedu_PRS` is the product of parental education and parental EA-PGS. `faminc1_PRS`, `faminc2_PRS`, and `faminc3_PRS` are generated for the three parental-income categories. The middle-income category is the reference group, so only `faminc1_PRS` and `faminc3_PRS` enter the interaction model.
+
+The continuous `use_Educational_attainment_PRS` is used in the models reported in Table 2, while `use_EducationPGS_5` is used for Figures 2 and 3.
+
 
 ## Timing of annual covariates
 
-Child born, employment, unemployment, and psychotropic medication use are measured in the same year as `stop_apply`. Starting studies in polytechnics is defined using entry in autumn of year *t-1* or spring of year *t*, following the coding used in the previous study on re-application behavior.
+Child born, employment, unemployment, and psychotropic medication use are measured in the same year as the event `stop_applying`. Starting studies in polytechnics is defined using entry in autumn of year *t-1* or spring of year *t*, following the coding used in the previous study on re-application behavior.
