@@ -1,6 +1,6 @@
 /*===============================================================================
   Persistence in reapplying to university after rejection
-  File:    01_build_discrete_time_sample.do
+  File:    02_build_discrete_time_sample.do
   Purpose: Construct the person-year sample for the logistic discrete-time
            hazard analysis of stop applying after rejection.
 
