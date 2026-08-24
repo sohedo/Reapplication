@@ -1,23 +1,29 @@
-# Stata workflow: Persistent university intentions
+Public Stata code accompanying the manuscript:
 
-This folder contains a cleaned, annotated version of the three Stata do-files.
-The code constructs a cohort dataset, builds supplementary application and education
-files, and creates the final person-year analysis sample.
+Persistence in reapplying to university after rejection: Associations with register-based mental health indicators and genetic endowment for educational attainment
+Henrik Dobewall, Hannu Lehti, Outi Sirniö, and Maria Vaalavuo
+
+The individual-level Finnish register and genetic data are restricted and cannot be shared by the authors.
+
+## Analyses in the paper
+
+The paper contains two separate analyses:
+
+- **Application outcomes:** person-level analyses in the full analytic sample, distinguishing individuals who never applied, were rejected, or were directly accepted to university. These analyses are cross-sectional and do not use the discrete-time person-year structure.
+- **Stop applying after experiencing rejection:** a longitudinal analysis restricted to university applicants whose first application ended in rejection. This analysis uses annual person-years and a logistic discrete-time hazard model.
+
+The public code focuses on the data coding required for the second analysis. `DATA_DESCRIPTION.md` describes the data and variables used in both parts of the paper.
+
+## Discrete-time coding
+
+For the re-application analysis, follow-up starts in the year after the first rejected university application. Each subsequent year contributes one person-year while the individual remains at risk. `stop_apply = 1` in the first year in which no new university application is made; a gap year therefore counts as stop applying. Follow-up ends at stop applying, university admission, the four-year follow-up limit, or the end of observation. Years after age 24 are excluded.
+
+`hakukerta` indexes annual time from the first application and is included as a categorical time variable in the logistic regression. The person-year risk-set construction, outcome coding, and time indicators make the logistic regression a discrete-time hazard model.
 
 ## Files
 
-- `00_config.do` —  restricted-data paths.
-- `01_build_basic_sample.do` — cohort selection, parent linkage, and parental education.
-- `02_build_supplementary_data.do` — university applications, exam grades, matriculation, and polytechnic enrolment.
-- `03_build_final_analysis_sample.do` — follow-up construction, merges, PGS variables, parental characteristics, and mental-health measures.
+- `DATA_DESCRIPTION.md` — data sources, analytic samples, variable definitions, and timing.
+- `01_build_discrete_time_sample.do` — constructs the post-rejection person-year risk set.
+- `02_discrete_time_models.do` — estimates the discrete-time models and interaction analyses.
 
-## Running the workflow
-
-1. Edit every placeholder path in `00_config.do`.
-2. Open Stata in Statistic Finland secure fiona environment.
-3. Run the numbered do-files in order.
-
-## Data availability
-
-We use Finnish register data that cannot be shared in any circumstances according to the strict rules of Statistics Finland.
-
+AI assisted the production of this repository. Full code available upon request.
