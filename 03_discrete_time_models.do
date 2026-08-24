@@ -1,6 +1,6 @@
 /*===============================================================================
   Persistence in reapplying to university after rejection
-  File:    02_discrete_time_models.do
+  File:    03_discrete_time_models.do
   Purpose: Estimate the logistic discrete-time hazard models of stop applying
            after rejection reported in Table 2 and Figures 2-3.
 
