@@ -21,6 +21,6 @@ The public code focuses on the data coding required for the second analysis. Dat
 - `00_data_description.md` — data structure, variable definitions, and timing.
 - `01_cross_sectional_application_outcomes.do` — person-level descriptive and cross-sectional analyses of application outcomes.
 - `02_build_discrete_time_sample.do` — constructs the post-rejection person-year risk set.
-- `03_discrete_time_hazard_models.do` — estimates the discrete-time hazard models and GxE analyses.
+- `03_discrete_time_models.do` — estimates the discrete-time hazard models and GxE analyses.
 
 AI assisted the production of this repository. Full code available upon request.
