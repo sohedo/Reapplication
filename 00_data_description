@@ -12,13 +12,13 @@ The paper first examines **application outcomes** at the person level in the ful
 2. applied but were rejected; or
 3. received direct admission.
 
-The manuscript reports 5,122 individuals who never applied, 2,797 who were rejected, and 953 who received direct admission. These are cross-sectional analyses and are separate from the discrete-time analysis. They use one observation per individual rather than person-years.
+The manuscript reports 5,122 individuals who never applied, 2,797 who were rejected, and 953 who received direct admission. These are cross-sectional analyses and are separate from the discrete-time analysis.
 
 The analysis of **stop applying after rejection** is longitudinal and is restricted to the 2,797 initially rejected applicants. Annual records are organized as person-years. The manuscript reports 4,987 person-years in these models.
 
 ## University application coding
 
-University application records are collapsed to one record per individual and calendar year. If an individual applied to several university study places in the same year, the annual outcome is coded as admission if the individual was admitted to at least one of them; otherwise the annual outcome is rejection. Years with no university application are retained because they are needed to identify stop applying during follow-up.
+University application records are collapsed to one record per individual and calendar year. If an individual applied to several university study places in the same year, the annual outcome is coded as admission if the individual was admitted to at least one of them; otherwise the annual outcome is rejection.
 
 In the preparation code:
 
@@ -32,9 +32,9 @@ From this, `hakee` identifies whether the individual applied and `paasee` identi
 
 The first university application defines the beginning of the application history. The re-application analysis includes individuals whose first application ended in rejection. Follow-up begins in the next calendar year.
 
-`hakukerta` is the annual clock from the first application. The first application year is `hakukerta = 1`, so `hakukerta = 2` is the first post-rejection risk interval. The models include `hakukerta` as a categorical time variable to allow the baseline hazard to vary across annual intervals. Follow-up is limited to a maximum of four years, corresponding to `hakukerta = 2` through `hakukerta = 5`.
+`hakukerta` is the annual clock from the first application. The first application year is `hakukerta = 1`, so `hakukerta = 2` is the first post-rejection risk interval. The models include `hakukerta` as a categorical time variable to allow the baseline hazard to vary across annual intervals. Max 4-year follow up.
 
-The outcome `stop_apply` is coded 1 in the first follow-up year in which the individual does not apply to university and 0 otherwise while the individual remains at risk. A gap year therefore counts as stop applying.
+The outcome `stop_apply` is coded 1 in the first follow-up year in which the individual does not apply to university and 0 otherwise while the individual remains at risk. 
 
 Follow-up ends at the earliest of:
 
@@ -47,31 +47,27 @@ Years in which individuals are older than 24 are excluded before the risk set is
 
 ## Variables used in the discrete-time models
 
+
 | Public code name | Description in the manuscript |
-|
+ 
 | `stop_apply` | Stop applying to university after rejection |
-| `hakukerta` | Annual time since first university application; entered categorically as the baseline hazard |
-| `parental_education` | University/polytechnic degree of the non-genotyped parent vs. less educated |
-| `parental_income` | Income of the non-genotyped parent: low (lowest 20%), medium (middle 60%), high (highest 20%) |
-| `parental_EA_PGS` | Polygenic score for educational attainment of the genotyped parent |
+| `parental_education` | Parents have university/polytechnic degree vs. less educated |
+| `parental_income` | Parental income: low (lowest 20%), medium (middle 60%), high (highest 20%) |
+| `parental_EA_PGS` | Parental polygenic score for educational attainment |
 | `psychiatric_diagnosis` | Psychiatric diagnosis before age 18 |
 | `psychotropic_medication` | Psychotropic medication use in the given year |
 | `child_born` | Child born |
 | `employment_months` | Employment, measured in months |
 | `started_polytechnic` | Started studies in polytechnics |
 | `unemployment_3m` | Unemployment period of more than three months |
-| `birth_cohort` | Birth cohort |
 | `female` | Female |
 | `matriculation_year` | Year of upper-secondary/matriculation qualification |
 | `region_birth` | Region of birth at NUTS2 level |
 | `parental_EA_PGS_quintile` | EA-PGS quintile used in interaction figures |
 | `use_PC1`-`use_PC10` | Genetic principal components |
 | `health_survey` | Source health survey |
-| `sfm_PRS` | Indicates whether the parental EA-PGS comes from the mother or father |
 
-Parental education and income are taken from the non-genotyped parent, while the EA-PGS is taken from the genotyped parent. `sfm_PRS` is included as a control for whether the EA-PGS comes from the mother or father. Parental income is based on average taxable income in 2001-2009.
-
-The GxE model includes manually created product terms between parental EA-PGS and parental education, and between parental EA-PGS and the low- and high-income categories. The middle-income category is the reference group. The continuous parental EA-PGS is used in Table 2, while quintiles are used for the interaction figures.
+Parental education and income are taken from the non-genotyped parent where possible, while the EA-PGS is taken from the genotyped parent. Parental income is based on average taxable income in 2001-2009.
 
 ## Timing of annual covariates
 
